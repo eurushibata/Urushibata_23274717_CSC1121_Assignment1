@@ -6,7 +6,7 @@ import json
 
 class Indexation:
 
-  # The documents structures are:
+  # The documents structures is:
   # {
   #   'docno': '1',
   #   'title': 'experimental investigation of the aerodynamics of a wing in a slipstream .',
@@ -48,6 +48,7 @@ class Indexation:
     stop_words = get_stop_words()
     return [token for token in tokens if token not in stop_words]
 
+  # create an inverted index of the collection
   def create_inverted_index(self):
     inverted_index = {}
     for document in self.documents:
@@ -59,6 +60,7 @@ class Indexation:
           inverted_index[token] = [document['docno']]
     return inverted_index
   
+  # count frequencies of each term in the collection
   def create_term_frequency(self):
     term_frequency = {}
     inverted_index = self.create_inverted_index()
