@@ -46,7 +46,7 @@ class RankingVSM:
     for term in document_term_matrix:
       dot_product += document_term_matrix[term] * query_vector[term]
     
-    # Calculate the Euclidian norm of the document and query vectors
+    # Calculate the Euclidian to normalize the document and query vectors
     magnitude_query = sum([value**2 for value in query_vector.values()])
     magnitude_document = sum([value**2 for value in document_term_matrix.values()])
 
