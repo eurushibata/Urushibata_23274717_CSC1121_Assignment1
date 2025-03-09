@@ -25,6 +25,10 @@ class RankingBM25:
   
   #  Calculate Probability Estimation
   # https://www.futurelearn.com/courses/mechanics-of-search-text-and-web-retrieval/4/steps/1866845
+
+  # https://www.elastic.co/blog/practical-bm25-part-3-considerations-for-picking-b-and-k1-in-elasticsearch
+    # 1.2 < k1 < 2   => 1.25
+    # 0.5 < b < 0.8 => 0.75
   def calculate_bm25(self, document_term_vector, word, k=1.25, b=0.75):
     N = len(self.collection.documents)
     n = sum(doc['clean_tokens'].count(word) for doc in self.collection.documents)
@@ -45,8 +49,4 @@ if __name__ == "__main__":
 
   res = ranking_bm25.query('experimental investigation of the aerodynamics of a wing in a slipstream .')
   print(res)
-
-# https://www.youtube.com/watch?v=ziiF1eFM3_4&t=1s
-  # 1.2 < k1 < 2   => 1.25
-  # 0.5 < b < 0.8 => 0.75
 
