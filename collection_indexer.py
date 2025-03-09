@@ -1,0 +1,100 @@
+#!/usr/bin/python
+from stopwords import escape_sequence, remove_stopwords
+import xmltodict
+import json
+
+class CollectionIndexer:
+  # limit_documents is used to limit the number of documents to be processed for development purposes
+  def __init__(self, file_path, limit_documents=None):
+    self.documents = []
+    with open(file_path, 'r') as f:
+      data = f.read()
+
+    # Wrap the data in a root tag since it isn't a XML data structure without a root element
+    data = f"<root>{data}</root>"
+
+    # Parse the XML data
+    xml_dict = xmltodict.parse(data)
+    json_data = json.dumps(xml_dict, indent=2)
+    # Parse the JSON data
+    self.documents = json.loads(json_data)['root']['doc']
+
+    if (limit_documents is not None):
+      self.documents = self.documents[:limit_documents]
+
+    print(f'Total documents loaded: {len(self.documents)}')
+
+    self.generate_tokens()
+
+  def get_documents(self):
+    return self.documents
+
+  def get_document(self, docno):
+    for doc in self.documents:
+      if int(doc['docno']) == int(docno):
+        return doc
+    return None
+  
+  def tokenize_document(self, docno):
+    for doc in self.documents:
+      if int(doc['docno']) == int(docno):
+        #  TODO: shoudl we use the title also? it seems that titles are included on the text.
+        text = doc['text']
+        # Remove escape sequences
+        if (text is None):
+          return []
+        for escape in escape_sequence():
+          text = text.replace(escape, " ")
+
+        # Tokenize the text by splitting by spaces
+        tokens = text.lower().split()
+        return tokens
+  
+  # Process of cleaning the tokens: Stopwords removal, stemming, etc.
+  def clean_tokens_by_document(self, docno):
+    tokens = self.tokenize_document(docno)
+    tokensWOStopWords = remove_stopwords(tokens)
+    # remove duplicate
+    remove_duplicate_tokens = list(set(tokensWOStopWords))
+    return remove_duplicate_tokens
+
+  def generate_tokens(self):
+    for doc in self.documents:
+      doc['clean_tokens'] = self.clean_tokens_by_document(doc['docno'])
+
+  #  create a terms index of the collection in format: {term: [docno1, docno2, ...]}
+  def generate_terms_index(self):
+    terms_index = {}
+    for doc in self.documents:
+      for token in doc['clean_tokens']:
+        if token in terms_index:
+          terms_index[token].append(doc['docno'])
+        else:
+          terms_index[token] = [doc['docno']]
+    return terms_index
+    
+  # Term-Document Matrix - Boolean Model
+  # https://www.futurelearn.com/courses/mechanics-of-search/4/steps/1866810
+  # create a term-document matrix by boolean model in format: {term1: {docno1: 0, docno2: 1}, term2: {docno1: 1, docno2: 0}}
+  # where 1 means the term is present in the document and 0 otherwise.
+  def generate_term_document_matrix(self):
+    terms_index = self.generate_terms_index()
+    term_document_matrix = {}
+    for term in terms_index:
+      term_document_matrix[term] = {}
+      for docno in [doc['docno'] for doc in self.documents]:
+        term_document_matrix[term][docno] = 1 if docno in terms_index[term] else 0
+    return term_document_matrix
+
+  # Document-Term Matrix - Boolean Model
+  # https://www.futurelearn.com/courses/mechanics-of-search/4/steps/1866813
+  # create a DOCUMENT-TERM matrix by boolean model in format: {docno1: {term1: 0, term2: 1}, docno2: {term1: 1, term2: 0}}
+  # where 1 means the term is present in the document and 0 otherwise.
+  def generate_document_term_matrix(self):
+    term_document_matrix = self.generate_term_document_matrix()
+    document_term_matrix = {}
+    for docno in [doc['docno'] for doc in self.documents]:
+      document_term_matrix[docno] = {}
+      for term in term_document_matrix:
+        document_term_matrix[docno][term] = term_document_matrix[term][docno]
+    return document_term_matrix

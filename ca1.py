@@ -1,6 +1,6 @@
 #!/usr/bin/python
 from bs4 import BeautifulSoup
-from search.stopwords import get_stop_words, escape_sequence
+from stopwords import escape_sequence, remove_stopwords
 import xmltodict
 import json
 
@@ -22,12 +22,14 @@ class Indexation:
     #  tokenize the text of a document given its docno
     for document in self.documents:
       tokens = self.tokenizeOneDocByDocno(document['docno'])
-      tokensWOStopWords = self.remove_stopwords(tokens)
+      tokensWOStopWords = remove_stopwords(tokens)
       # print(f'Docno: {document["docno"]}')
       # print(f'Tokens({len(tokens)}): ({tokens})')
       # print(f'Tokens after stopwords({len(tokensWOStopWords)}): ({tokensWOStopWords})')
       document['tokens'] = tokens
       document['tokensWOStopWords'] = tokensWOStopWords
+    
+    self.generateTokens()
 
   def tokenizeOneDocByDocno(self, docno):
     for document in self.documents:
@@ -43,10 +45,6 @@ class Indexation:
         # Tokenize the text by splitting by spaces
         tokens = text.lower().split()
         return tokens
-
-  def remove_stopwords(self, tokens):
-    stop_words = get_stop_words()
-    return [token for token in tokens if token not in stop_words]
 
   # create an inverted index of the collection
   def create_inverted_index(self):
@@ -88,7 +86,7 @@ if __name__ == "__main__":
 
   docs = Indexation(xml_dict['root']['doc'])
   tokens = docs.tokenizeOneDocByDocno(1)
-  tokensWOStopWords = docs.remove_stopwords(tokens)
+  tokensWOStopWords = remove_stopwords(tokens)
   # print(f'Tokens({len(tokens)}): ({tokens})')
   # print(f'Tokens after stopwords({len(tokensWOStopWords)}): ({tokensWOStopWords})')
 
