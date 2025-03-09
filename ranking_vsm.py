@@ -36,12 +36,12 @@ class RankingVSM:
     # print(query_vector)
 
     # calculate the cosine similarity
-    similarity_by_documents = {}
+    similarity_all_documents = {}
     for docno, document_term_matrix in terms_index.items():
-      similarity_by_documents[docno] = self.cosine_similarity(query_vector, document_term_matrix)
-    return similarity_by_documents
+      similarity_all_documents[docno] = self.cosine_similarity_per_document(query_vector, document_term_matrix)
+    return similarity_all_documents
   
-  def cosine_similarity(self, query_vector, document_term_matrix):
+  def cosine_similarity_per_document(self, query_vector, document_term_matrix):
     dot_product = 0
     for term in document_term_matrix:
       dot_product += document_term_matrix[term] * query_vector[term]
@@ -61,6 +61,19 @@ class RankingVSM:
     similarity = self.calculate_similarity(query)
     return similarity
 
+  # Relevant Judgement
+  # https://www.futurelearn.com/courses/mechanics-of-search/4/steps/1866826
+  def generate_relevance_judgement(self, similarity_object):
+    # delete the similarity scores = 0
+    relevance_judgement_rank = []
+    for docno, score in similarity_object.items():
+      if score > 0:
+        relevance_judgement_rank.append({ docno: score })
+    # sort the similarity scores (descending)
+    relevance_judgement_rank.sort(key=lambda x: list(x.values())[0], reverse=True)
+    # print(relevance_judgement_rank)
+    return relevance_judgement_rank
+
 if __name__ == "__main__":
   # for testing purpose, define the collection size
   # limit = 2 # any number or None
@@ -69,4 +82,5 @@ if __name__ == "__main__":
   ranking_vsb = RankingVSM(collection)
 
   similarity = ranking_vsb.query('what similarity laws must be obeyed when constructing aeroelastic models of heated high speed aircraft .')
-  print(similarity)
+  relevance_judgement = ranking_vsb.generate_relevance_judgement(similarity)
+  print(relevance_judgement)
