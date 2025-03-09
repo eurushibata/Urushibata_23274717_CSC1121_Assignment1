@@ -43,11 +43,8 @@ if __name__ == "__main__":
   ranking_bm25 = RankingBM25(collection)
 
 
-  res = ranking_bm25.query('can a criterion be developed to show empirically the validity of flow solutions for chemically reacting gas mixtures based on the simplifying assumption of instantaneous local chemical equilibrium .')
+  res = ranking_bm25.query('experimental investigation of the aerodynamics of a wing in a slipstream .')
   print(res)
-  # relevance_judgement = ranking_vsb.generate_relevance_judgement(similarity)
-  # print(relevance_judgement)
-
 
 # https://www.youtube.com/watch?v=ziiF1eFM3_4&t=1s
   # 1.2 < k1 < 2   => 1.25
