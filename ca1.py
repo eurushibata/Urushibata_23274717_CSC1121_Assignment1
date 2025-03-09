@@ -81,15 +81,6 @@ if __name__ == "__main__":
   xml_dict = xmltodict.parse(data)
   json_data = json.dumps(xml_dict, indent=2)
   parsed_json = json.loads(json_data)
-  # json_data = json.dumps(xml_dict, indent=2)
-
-  # Bs_data = BeautifulSoup(data, "xml")
-  # titles = Bs_data.find_all('title')
-  # texts = Bs_data.find_all('text')
-
-  # print(Bs_data)
-  # print(xml_dict['root'])
-
 
 
 
@@ -103,23 +94,6 @@ if __name__ == "__main__":
   print(f'Inverted Index: {index}')
   
   print(f'Term Frequency: {docs.create_term_frequency()}')
-
-
-
-
-
-  # Using find() to extract attributes 
-  # of the first instance of the tag
-  # b_name = Bs_data.find('child', {'name':'Frank'})
-
-  # print(b_name)
-
-  # Extracting the data stored in a
-  # specific attribute of the 
-  # `child` tag
-  # value = b_name.get('test')
-
-  # print(value)
 
 
   # Steps:
