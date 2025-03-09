@@ -1,3 +1,6 @@
+def escape_sequence():
+  return ['\n', '\r', '\t', '\v', '\f', '\b', '\a', '\\', '\'', '\"']
+
 # list taken from https://www.geeksforgeeks.org/removing-stop-words-nltk-python/
 def get_stop_words():
   return ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 
