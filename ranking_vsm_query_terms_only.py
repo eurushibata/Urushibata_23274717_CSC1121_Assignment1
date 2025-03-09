@@ -1,4 +1,4 @@
-# implement ranking vector space model using cosine similarity
+# implement ranking vector space model using cosine similarity (this variation only uses the terms present in the query)
 from corpus_indexer import CorpusIndexer
 from datetime import datetime
 
@@ -18,27 +18,30 @@ class RankingVSM:
   # use the self.document_term_matrix to create the VSM
   def calculate_similarity(self, query):
     clean_query_tokens = self.collection.clean_tokens(query.split())
-    # get the document-terms matrix
-    terms_index =  self.document_term_matrix
 
-    # to use the dot product, the query needs to follow same structure as the document_term_matrix
-    # clone the document_term_matrix structure and reset the terms values to 0
     query_vector = {}
-    for term in terms_index[1]:
-      query_vector[term] = 0
-    # print(query_vector)
-  
-    # now, update the query_document_term_matrix_instance with the query terms frequency
-    # the tokens that are not known will be ignored
+    query_terms = []
     for term in clean_query_tokens:
       if term in query_vector:
         query_vector[term] += 1
-    print(query_vector)
+      else:
+        query_vector[term] = 1
+        query_terms.append(term)
+    # print(query_vector)
+
+    # # to simplify the calculation, we can remove the terms that are not in the query
+    clean_document_term_matrix = {}
+    for docno, terms_index in self.document_term_matrix.items():
+      clean_document_term_matrix[docno] = {}
+      for term in query_terms:
+        if term in terms_index:
+          clean_document_term_matrix[docno][term] = terms_index[term]
+      # print(clean_document_term_matrix)
 
     # calculate the cosine similarity
     similarity_all_documents = {}
-    for docno, document_term_matrix in terms_index.items():
-      similarity_all_documents[docno] = self.cosine_similarity_per_document(query_vector, document_term_matrix)
+    for docno, document_term_vector in clean_document_term_matrix.items():
+      similarity_all_documents[docno] = self.cosine_similarity_per_document(query_vector, document_term_vector)
     return similarity_all_documents
   
   def cosine_similarity_per_document(self, query_vector, document_term_matrix):
@@ -76,11 +79,11 @@ class RankingVSM:
 
 if __name__ == "__main__":
   # for testing purpose, define the collection size
-  limit = 3 # any number or None
-  # limit = None
+  # limit = 2 # any number or None
+  limit = None
   collection = CorpusIndexer('./cranfield-trec-dataset/cran.all.1400.xml', limit)
   ranking_vsb = RankingVSM(collection)
 
-  similarity = ranking_vsb.query('alice cat')
+  similarity = ranking_vsb.query('experimental investigation of the aerodynamics of a wing in a slipstream')
   relevance_judgement = ranking_vsb.generate_relevance_judgement(similarity)
   print(relevance_judgement)

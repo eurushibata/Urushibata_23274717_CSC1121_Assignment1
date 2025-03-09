@@ -3,7 +3,7 @@ from stopwords import escape_sequence, remove_stopwords
 import xmltodict
 import json
 
-class CollectionIndexer:
+class CorpusIndexer:
   # limit_documents is used to limit the number of documents to be processed for development purposes
   def __init__(self, file_path, limit_documents=None):
     self.documents = []
