@@ -49,20 +49,25 @@ class CollectionIndexer:
         # Tokenize the text by splitting by spaces
         tokens = text.lower().split()
         return tokens
-  
+        
   # Process of cleaning the tokens: Stopwords removal, stemming, etc.
-  def clean_tokens_by_document(self, docno):
-    tokens = self.tokenize_document(docno)
+  def clean_tokens(self, tokens):
     tokensWOStopWords = remove_stopwords(tokens)
     # remove duplicate
-    remove_duplicate_tokens = list(set(tokensWOStopWords))
-    return remove_duplicate_tokens
+    # remove_duplicate_tokens = list(set(tokensWOStopWords))
+    # return remove_duplicate_tokens
+    return tokensWOStopWords
+  
+  def clean_tokens_by_document(self, docno):
+    tokens = self.tokenize_document(docno)
+    return self.clean_tokens(tokens)
 
   def generate_tokens(self):
     for doc in self.documents:
       doc['clean_tokens'] = self.clean_tokens_by_document(doc['docno'])
 
-  #  create a terms index of the collection in format: {term: [docno1, docno2, ...]}
+  #  create a terms index of the collection in format: {term: [docno1, docno1, docno2, ...]}
+  #  terms that appear more than once is repeated in the list
   def generate_terms_index(self):
     terms_index = {}
     for doc in self.documents:
@@ -73,28 +78,34 @@ class CollectionIndexer:
           terms_index[token] = [doc['docno']]
     return terms_index
     
-  # Term-Document Matrix - Boolean Model
+  # Term-Document Matrix - Freqency Model
   # https://www.futurelearn.com/courses/mechanics-of-search/4/steps/1866810
-  # create a term-document matrix by boolean model in format: {term1: {docno1: 0, docno2: 1}, term2: {docno1: 1, docno2: 0}}
-  # where 1 means the term is present in the document and 0 otherwise.
+  # create a term-document matrix by frequency model in format: {term1: {docno1: 0, docno2: 2}, term2: {docno1: 1, docno2: 0}}
+  # where 1+ means the term is present in the document and 0 otherwise.
   def generate_term_document_matrix(self):
     terms_index = self.generate_terms_index()
+    # print(terms_index)
     term_document_matrix = {}
     for term in terms_index:
       term_document_matrix[term] = {}
-      for docno in [doc['docno'] for doc in self.documents]:
-        term_document_matrix[term][docno] = 1 if docno in terms_index[term] else 0
+      for doc in self.documents:
+        term_document_matrix[term][int(doc['docno'])] = doc['clean_tokens'].count(term)
+    # print(term_document_matrix)
     return term_document_matrix
 
-  # Document-Term Matrix - Boolean Model
+
+  # Document-Term Matrix - Freqency Model
   # https://www.futurelearn.com/courses/mechanics-of-search/4/steps/1866813
-  # create a DOCUMENT-TERM matrix by boolean model in format: {docno1: {term1: 0, term2: 1}, docno2: {term1: 1, term2: 0}}
-  # where 1 means the term is present in the document and 0 otherwise.
+  # create a DOCUMENT-TERM matrix by frequency model in format: {docno1: {term1: 0, term2: 2}, docno2: {term1: 1, term2: 0}}
+  # where 1+ means the term is present in the document and 0 otherwise.
   def generate_document_term_matrix(self):
     term_document_matrix = self.generate_term_document_matrix()
     document_term_matrix = {}
-    for docno in [doc['docno'] for doc in self.documents]:
-      document_term_matrix[docno] = {}
-      for term in term_document_matrix:
-        document_term_matrix[docno][term] = term_document_matrix[term][docno]
+    for term in term_document_matrix:
+      for docno, count in term_document_matrix[term].items():
+        if docno in document_term_matrix:
+          document_term_matrix[docno][term] = count
+        else:
+          document_term_matrix[docno] = {term: count}
+    # print(document_term_matrix)
     return document_term_matrix
