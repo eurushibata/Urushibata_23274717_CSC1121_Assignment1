@@ -2,6 +2,7 @@
 from stopwords import escape_sequence, remove_stopwords
 import xmltodict
 import json
+import string
 
 class CorpusIndexer:
   # limit_documents is used to limit the number of documents to be processed for development purposes
@@ -40,9 +41,15 @@ class CorpusIndexer:
       if int(doc['docno']) == int(docno):
         #  TODO: shoudl we use the title also? it seems that titles are included on the text.
         text = doc['text']
-        # Remove escape sequences
+
+        # return empty tokens if text is None or ""
         if (text is None):
           return []
+
+        # remove punctuation from document and lower case it.
+        text.translate(str.maketrans('', '', string.punctuation)).lower()
+
+        # Remove escape sequences
         for escape in escape_sequence():
           text = text.replace(escape, " ")
 
@@ -52,7 +59,8 @@ class CorpusIndexer:
         
   # Process of cleaning the tokens: Stopwords removal, stemming, etc.
   def clean_tokens(self, tokens):
-    tokensWOStopWords = remove_stopwords(tokens)
+    tokens_lower = [token.lower() for token in tokens]
+    tokensWOStopWords = remove_stopwords(tokens_lower)
     # remove duplicate
     # remove_duplicate_tokens = list(set(tokensWOStopWords))
     # return remove_duplicate_tokens

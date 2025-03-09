@@ -28,12 +28,12 @@ class RankingVSM:
       query_vector[term] = 0
     # print(query_vector)
   
-    # now, update the query_document_term_matrix_instance with the query terms frequency
+    # update the query_document_term_matrix_instance with the query terms frequency
     # the tokens that are not known will be ignored
     for term in clean_query_tokens:
       if term in query_vector:
         query_vector[term] += 1
-    print(query_vector)
+    # print(query_vector)
 
     # calculate the cosine similarity
     similarity_all_documents = {}
@@ -76,11 +76,11 @@ class RankingVSM:
 
 if __name__ == "__main__":
   # for testing purpose, define the collection size
-  limit = 3 # any number or None
-  # limit = None
+  # limit = 3 # any number or None
+  limit = None
   collection = CorpusIndexer('./cranfield-trec-dataset/cran.all.1400.xml', limit)
   ranking_vsb = RankingVSM(collection)
 
-  similarity = ranking_vsb.query('alice cat')
+  similarity = ranking_vsb.query('experimental investigation of the aerodynamics of a wing in a slipstream .')
   relevance_judgement = ranking_vsb.generate_relevance_judgement(similarity)
   print(relevance_judgement)
