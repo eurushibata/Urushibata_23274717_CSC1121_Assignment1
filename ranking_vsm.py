@@ -56,19 +56,16 @@ class RankingVSM:
     else:
       similarity = dot_product / ((magnitude_query * magnitude_document) ** 0.5)
     return similarity
-  
-  def query(self, query):
-    similarity = self.calculate_similarity(query)
-    return similarity
 
   # Relevant Judgement
   # https://www.futurelearn.com/courses/mechanics-of-search/4/steps/1866826
-  def generate_relevance_judgement(self, similarity_object):
+  def query(self, query):
+    similarity = self.calculate_similarity(query)
     # delete the similarity scores = 0
     relevance_judgement_rank = []
-    for docno, score in similarity_object.items():
-      if score > 0:
-        relevance_judgement_rank.append({ docno: score })
+    for docno, score in similarity.items():
+      # if score > 0:
+      relevance_judgement_rank.append({ docno: score })
     # sort the similarity scores (descending)
     relevance_judgement_rank.sort(key=lambda x: list(x.values())[0], reverse=True)
     # print(relevance_judgement_rank)
@@ -82,5 +79,4 @@ if __name__ == "__main__":
   ranking_vsb = RankingVSM(collection)
 
   similarity = ranking_vsb.query('experimental investigation of the aerodynamics of a wing in a slipstream .')
-  relevance_judgement = ranking_vsb.generate_relevance_judgement(similarity)
-  print(relevance_judgement)
+  print(similarity)

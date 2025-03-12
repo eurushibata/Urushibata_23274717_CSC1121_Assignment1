@@ -17,15 +17,15 @@ class RankingBM25:
   def query(self, query):
     clean_query_tokens = self.collection.clean_tokens(query.split())
        
-    bm25_array = {}
+    bm25_array = []
     for doc in self.collection.documents:
       total_score = sum(self.calculate_bm25(doc['clean_tokens'], query_token) for query_token in clean_query_tokens)
-      bm25_array[doc['docno']] = total_score
+      bm25_array.append({ int(doc['docno']): total_score })
+      bm25_array.sort(key=lambda x: list(x.values())[0], reverse=True)
     return bm25_array
   
   #  Calculate Probability Estimation
   # https://www.futurelearn.com/courses/mechanics-of-search-text-and-web-retrieval/4/steps/1866845
-
   # https://www.elastic.co/blog/practical-bm25-part-3-considerations-for-picking-b-and-k1-in-elasticsearch
     # 1.2 < k1 < 2   => 1.25
     # 0.5 < b < 0.8 => 0.75
@@ -47,6 +47,6 @@ if __name__ == "__main__":
   ranking_bm25 = RankingBM25(collection)
 
 
-  res = ranking_bm25.query('experimental investigation of the aerodynamics of a wing in a slipstream .')
+  res = ranking_bm25.query('airplane wing.')
   print(res)
 
