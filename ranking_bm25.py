@@ -1,6 +1,5 @@
 # implement BM25 algorithm
 from corpus_indexer import CorpusIndexer
-import numpy as np
 import math
 
 class RankingBM25:

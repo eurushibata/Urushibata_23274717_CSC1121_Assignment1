@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from stopwords import escape_sequence, remove_stopwords
+from stopwords import escape_sequence, remove_stopwords, get_punctuation
 import xmltodict
 import json
 import string
@@ -39,15 +39,17 @@ class CorpusIndexer:
   def tokenize_document(self, docno):
     for doc in self.documents:
       if int(doc['docno']) == int(docno):
-        #  TODO: shoudl we use the title also? it seems that titles are included on the text.
         text = doc['text']
 
         # return empty tokens if text is None or ""
         if (text is None):
           return []
 
-        # remove punctuation from document and lower case it.
-        text.translate(str.maketrans('', '', string.punctuation)).lower()
+        # remove punctuation from document
+        text.translate(str.maketrans('', '', get_punctuation()))
+
+        # Remove dots and commas following the rule that comma has a space after it and dot has a space before it
+        text = text.replace(", ", " ").replace(" .", " ")
 
         # Remove escape sequences
         for escape in escape_sequence():
