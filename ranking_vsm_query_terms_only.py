@@ -66,7 +66,7 @@ class RankingVSM_Q:
     similarity = self.calculate_similarity(query)
     # delete the similarity scores = 0
     relevance_judgement_rank = []
-    for docno, score in similarity_object.items():
+    for docno, score in similarity.items():
       if score > 0:
         relevance_judgement_rank.append({ docno: score })
     # sort the similarity scores (descending)
