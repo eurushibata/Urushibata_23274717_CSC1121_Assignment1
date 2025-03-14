@@ -4,6 +4,7 @@ from simple_term_menu import TerminalMenu
 from corpus_indexer import CorpusIndexer
 from topic_reader import ReadTopics
 from ranking_vsm import RankingVSM
+from ranking_vsm_query_terms_only import RankingVSM_Q
 from ranking_bm25 import RankingBM25
 # def main():
 #     options = [
@@ -24,8 +25,8 @@ def execute(ranking_algorithm, query_filepath, output_filename):
     print("Vector Space Model")
     algo = RankingVSM(collection)
   if (ranking_algorithm == "vsm_q"):
-    print("Vector Space Model")
-    algo = RankingVSM(collection)
+    print("Vector Space Model (quicker)")
+    algo = RankingVSM_Q(collection)
   elif (ranking_algorithm == "bm25"):
     print("BM25")
     algo = RankingBM25(collection)

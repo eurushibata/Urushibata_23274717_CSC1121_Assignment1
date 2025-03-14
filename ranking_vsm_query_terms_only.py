@@ -2,7 +2,7 @@
 from corpus_indexer import CorpusIndexer
 from datetime import datetime
 
-class RankingVSM:
+class RankingVSM_Q:
   def __init__(self, collection):
     self.collection = collection
     self.document_term_matrix = None
