@@ -7,10 +7,10 @@ class RankingVSM:
     self.collection = collection
     self.document_term_matrix = None
 
-    start_time = datetime.now()
+    # start_time = datetime.now()
     print('STARTED: creating DOCUMENT-TERM matrix')
     self.document_term_matrix = collection.generate_document_term_matrix()
-    print(f'FINISHED ({(datetime.now() - start_time).total_seconds()} seconds)')
+    # print(f'FINISHED ({(datetime.now() - start_time).total_seconds()} seconds)')
     # print(self.document_term_matrix)
 
   # Create Vector Space Model

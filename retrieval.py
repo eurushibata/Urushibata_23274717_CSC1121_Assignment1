@@ -6,6 +6,7 @@ from topic_reader import ReadTopics
 from ranking_vsm import RankingVSM
 from ranking_vsm_query_terms_only import RankingVSM_Q
 from ranking_bm25 import RankingBM25
+from datetime import datetime
 # def main():
 #     options = [
 #        "Vector Space Model",
@@ -21,6 +22,7 @@ from ranking_bm25 import RankingBM25
 def execute(ranking_algorithm, query_filepath, output_filename):
   collection = CorpusIndexer('./cranfield-trec-dataset/cran.all.1400.xml')
   algo = None
+  start_time = datetime.now()
   if (ranking_algorithm == "vsm"):
     print("Vector Space Model")
     algo = RankingVSM(collection)
@@ -55,6 +57,8 @@ def execute(ranking_algorithm, query_filepath, output_filename):
     f.write(result)
     f.write("\n")
   f.close()
+  
+  print(f'FINISHED ({(datetime.now() - start_time).total_seconds()} seconds)')
 
 def format_output(num, q0, docid, rank, score, system):
   return f"{num} {q0} {docid} {rank} {score} {system}"
